@@ -1,0 +1,18 @@
+ yarn add react-router-dom  @material-ui/core @material-ui/icons yup libphonumber-js react-drop-zone react-hook-form sweetalert2 react-confetti
+yup - per la validazione della form
+libphonumber-js -per la normalizzazione del numero di telefono
+react-drop-zone -per pooter ricevere in modalità drug and drop file
+react-hook-form - libreria react per gestire i form si dice che una delle piu comode
+sweetalert2 -e uno strumento ottimo per fare dei pop-up complessi
+react-confetti   -un effeto dello schermo che ci butta delle caramelle tipo hai vinto!
+
+
+2.
+register method is no longer occurred at ref,
+instead invoke the function itself and spread the props into the input. 
+The function itself will return the following props: onChange, onBlur, name and ref.
+
+3.
+Date picker: install this two packages
+npm i @material-ui/pickers
+npm i @date-io/date-fns@1.x date-fns

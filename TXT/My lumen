@@ -1,0 +1,305 @@
+
+
+
+1.
+composer require flipbox/lumen-generator
+
+2. Inside your bootstrap/app.php file, add:
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+
+
+
+3. 
+php artisan key:generate
+
+***se il comando key generate da problemi generiamo la stringa e la incoliamo nel aposito campo in .env
+   creiamo una rotta /key, facciamo partire il server con:  php -S localhost:8000 -t public e ci prendiamo la stringa la route e:
+
+    $router->get('/key', function() {
+        return \Illuminate\Support\Str::random(32);
+    });
+
+
+
+4. model migration factory controller
+php artisan make:model Post -fmc
+
+
+
+
+5. Prima di lanciare tinker assicurarsi di aver inserito nel model rispettivo le righe comentate 1 e 2:
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;   // 1 questa riga
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    use HasFactory;    // 2 e questa riga
+}
+
+
+6. poi possiamo lanciare tranquillamente:
+php artisan tinker
+>>>App\Models\Post::factory()->count(10)->create()
+
+
+
+7.
+php artisan make:migration create_users_table --create=users
+
+
+8. Alla user_migration aggiungiamo queste righe: 
+
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+
+9. lanciamo 
+php artisan migrate
+
+
+10.  aggiungiamo alla factory user il campo password che ce lo crea hashato:
+'password' => app('hash')->make('123456')
+
+
+11.  poi lanciamo il tinker:
+php artisan tinker
+>>>App\Models\User::factory()->count(5)->create()
+
+
+
+
+
+**************AUTH WITH JWT*************************
+
+1.
+composer require tymon/jwt-auth
+
+
+2. ****Dobbiamo registrare il serviceProviderClass in bootstrap/app: CIOE:
+
+// $app->register(App\Providers\AppServiceProvider::class);
+   $app->register(App\Providers\AuthServiceProvider::class);  *<-SCOMENTIAMO QUESTA RIGA
+// $app->register(App\Providers\EventServiceProvider::class);
+   $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+   $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);  **<-AGGIUNGIAMO QUESTA RIGA
+
+
+
+
+3. DOBBIAMO SCOMENTARE QUESTE RIGHE SEMPRE IN bootstrap/app.php
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+]);
+
+
+
+
+4. GENERIAMO LA CHIAVE SEGRETA LANCIANDO DA TERMINALE  QUESTO COMANDO:
+php artisan jwt:secret     
+
+***AGIUNGERA AL FILE .ENV LA JWT_SECRET_KEY IN FONDO AL FILE
+
+
+
+
+
+5. Scomentare nel file bootstrap/app.php i seguenti campi: per poter utilizare le facades ed'eloquent
+ $app->withFacades();
+ $app->withEloquent();
+
+
+
+6. Fare i sequenti 5 passi nel Model User cosi deve essere: questo e un file Models\User intero per come dev'essere:
+<?php
+namespace App\Models;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Laravel\Lumen\Auth\Authorizable;
+use Tymon\JWTAuth\Contracts\JWTSubject;                                  *1. Importare questa riga
+use Illuminate\Support\Facades\Auth;                                     *2.  Importare questa riga
+
+
+class User extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject                    *3. qui deve essere anche JWTSubject 
+{
+    use Authenticatable, Authorizable, HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name', 'email', 'password'
+    ];
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+    ];
+
+    
+    public function getJWTIdentifier()                                *4. aggiungere getJWTIdentifier method:
+    {
+      return $this->getKey();
+    }
+
+
+    public function getJWTCustomClaims()                               *5. aggiungere getJWTCustomClaims method:
+    {
+        return [];
+    }
+}
+
+
+
+
+
+7. CREARE LA CARTELLA CONFIG CON IL FILE AUTH ALL'INTERNO  config/auth.php e incoliamo questo codice:
+<?php
+  return [
+    'defaults' => [
+        'guard' => 'api',
+        'passwords' => 'users',
+    ],
+
+    'guards' => [
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
+    ],
+
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\User::class
+        ]
+    ]
+];
+
+
+
+
+8. Per usare le impostazioni della  config/auth.php  dobbiamo modificare questa riga in bootstrap/app.php :
+$app->configure('app'); 
+
+deve diventare:
+
+$app->configure('auth'); 
+
+
+
+
+9. creiamo il controller:
+php artisan make:controller AuthController
+
+
+10. ADESSO CREIAMO LE ROTTE:
+$router->post('/api/login', 'AuthController@login');
+
+
+
+11. Nell AuthController andiamo ad aggiungere in alto:
+use App\Models\User;
+
+
+
+
+12. Nell AuthController andiamo a creare il metodo login:
+
+ public function login(Request $request)
+    {
+        $email = $request->email;
+        $password = $request->password;
+
+        //Check if field is empty
+        if(empty($email)or empty($password)){
+            return response()->json(['status'=>'error', 'message'=>'You must fill all the fields']);
+        }
+
+        $credentials = request(['email', 'password']);
+
+        if(! $token = auth()->attempt($credentials)) {
+            return response()->json( ['status'=>'error', 'message'=>'Unauthorized'], 401 );
+        }
+        return $this->respondWithToken($token);
+
+
+    }
+
+12. poi sempre nell AuthController creiamo il metodo respondWithToken() usato nella login() come return e lo mettiamo in fondo al file:
+
+     protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token'=> $token,
+            'token_type' => 'bearer',
+            'expires_in' =>auth()->factory()->getTTL() * 60
+        ]);
+    }
+
+
+13. tutto qui ora la nostre rotta login e consumabile
+
+
+***********************************
+//validation request register, check if field is not empty:
+
+
+if(empty($name) or  empty($email) or empty($password)){
+    return response()->json(['status'=>'error','message'=>'You must enter  a valid email']);
+}
+
+//check if email is valid
+
+if (filter_var($email, FILTER_VALIDATE_EMAIL)){
+    return response()->json(['status'=>'error','massage'=>'You must enter a valid email'])
+}
+
+//check if password is grater than 5 characters:
+if(strlen($password) < 6){
+    return response()->json(['status'=>'error','message'=>'Password should be min 6 character']);
+}
+
+//check if user already exist
+if( User::where('email', '=', $email)->exists() ){
+    return response()->json(['status'=>'errors', 'message'=>'User already exists with this email'])
+}
+
+
+try{
+    $user = new User();
+    $user->name = $name;
+    $user->password = app('hash')->make($password);
+
+    if($user->save()){
+        return $this->login($request);
+       // return 'user create successfuly';
+    }
+} catch (\Exception $e){
+    return response()->json(['status'=>'error','message'=> $e->getMessage()]);
+}
+
+
+*************************************************
+//LOGOUT
+   public function logout(Request $request)
+    {
+      try{  auth()->user()->tokens()->each(function ($token){
+            $token->delete();
+            });
+            return response()->json(['status'=>'error','message'=>'Logegd out successfuly']);
+      } catch ( \Exception $e) {
+            return response()->json(['status'=>'error','message'=>$e->getMessage()])
+
+        }
+    }

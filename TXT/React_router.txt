@@ -1,0 +1,84 @@
+window.history.back()       oppure    window.history.go(-1)
+window.history.forward()    oppure    window.history.go(1)
+
+// refreshing the page
+window.history.go(0)
+window.history.go()
+
+//numero di pagine nello stack delle cronologie
+let numberOfEntries = window.history.length
+
+
+window.location.state
+
+
+************************domanda? con props.history.replace(path, [state]); si fa il redirect della pagina senza ricaricarla?
+</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,</BrowserRouter>,
+</BrowserRouter>, avvolge la nostra app:
+
+Route ci dice quale componente ce da renderizzare:
+<Route path="/" component={}/>
+
+1.
+Ogni cosa racchiusa tra </BrowserRouter>, riceve come props Match  Location e History
+
+a.
+Match:
+ -params: (object), key/value pairs parsed from the URL corresponding to the dynamic segments of the path
+ -isExact: (boolean), true if the entire URL was matched (no trailing characters)
+ -path: (string), the path pattern used to match. Useful for building nested routes. We’ll take a look at this later in one of the next articles.
+ -url: (string), the matched portion of the URL. Useful for building nested links.
+ 
+b.
+isExact: is true because the entire URL was matched, the params object is empty because we didn’t pass anything into it, the path and the url key values are equal 
+         confirming that isExact is true.
+
+c.
+Location: The location object represents where the app is now, where you want it to go, or even where it was.
+          It’s also found on history.location but you shouldn’t use that because it’s mutable.
+          A location object is never mutated so you can use it in the lifecycle hooks to determine when navigation happens.
+          This is really useful for data fetching or DOM side effects.
+
+d.
+History:
+The history object allows you to manage and handle the browser history inside your views or components.
+
+-length: (number), the number of entries in the history stack
+-action: (string), the current action (PUSH, REPLACE or POP)
+-location: (object), the current location
+-push(path, [state]): (function), pushes a new entry onto the history stack
+-replace(path, [state]): (function), replaces the current entry on the history stack
+-go(n): (function), moves the pointer in the history stack by n entries
+-goBack(): (function), equivalent to go(-1)
+-goForward(): (function,) equivalent to go(1)
+-block(prompt): (function), prevents navigation
+
+
+So let’s console.log the history object in our Home View and see what it shows:
+
+
+<Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect><Redirect>
+to: string
+to: object:
+
+-to: string: The URL to redirect to. Any valid URL path that path-to-regexp@^1.7.0 understands.
+             All URL parameters that are used in to must be covered by from.<Redirect to="/somewhere/else" />
+
+
+-to: object: A location to redirect to. pathname can be any valid URL path that path-to-regexp@^1.7.0 understands.
+
+<Redirect
+  to={{
+    pathname: "/login",
+    search: "?utm=your+face",
+    state: { referrer: currentLocation }
+  }}
+/>
+    
+The state object can be accessed via this.props.location.state in the redirected-to component.
+This new referrer key (which is not a special name) would then be accessed via this.props.location.state.referrer in the Login component pointed to by the pathname '/login'.
+
+
+
+
+

@@ -1,0 +1,9 @@
+1. new date() ci ritorna la data atuale , 
+(new Date()) lo avvolgiamo tra parentesi tonde cosi abbiamo accesso ai suoi metodi, cosi chiamiamo (new Date()).getTime() che ci ritorna
+il tempo in millesecondi dal tempo unix cosi abbiamo il momento attuale, li sommiamo la quantita di tempo del token salvato nel  campo expires_in cosi avremo il tempo quando scadra il token
+const expireDate = (new Date()).getTime() + data['expires_in']*1000;
+
+2.
+new Date() -No parameters, when no parameters are provided, the newly-created Date object represents the current date and time as of the time of instantiation.
+il segno + davanti a: +localStorage.getItem('token_expires') fa il cast a numero della stringa perche in local storage i dati sono salvati come stringhe cioe json.
+const tokenExpired = +localStorage.getItem('token_expires')

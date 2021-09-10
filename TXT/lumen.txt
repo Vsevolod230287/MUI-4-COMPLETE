@@ -1,0 +1,70 @@
+Installare composer
+
+https://getcomposer.org/
+
+
+Installare lumen con composer
+composer create-project --prefer-dist laravel/lumen <nome dell'applicazione>
+
+
+
+Articoli utili
+https://auth0.com/blog/developing-restful-apis-with-lumen/
+https://dev.to/ndiecodes/build-a-jwt-authenticated-api-with-lumen-2afm
+
+
+Modificare il file .env inserendo le credenziali del database e il nome dell'applicazione (senza spazi)
+
+Per creare le tabelle digitare il comando:
+
+php artisan make:migration create_<nome tabella>_table
+php artisan make:migration create_users_table --create=users
+
+
+crea una script che va editato per inserire manualmente i campi della tabella
+Lo script è dentro la cartella database/migrations
+
+Per creare le tabelle nelle DB, una volta creati i files di migration
+eseguire il comando:
+php artisan migrate
+
+
+
+Scaricare il pacchetto per il JWT
+composer require tymon/jwt-auth:dev-develop
+
+
+Seguire la guida per l'installazione
+https://jwt-auth.readthedocs.io/en/develop/lumen-installation/
+
+
+Comando per generare la secret API
+php artisan jwt:secret
+
+
+
+Per disattivare la CORS POLICY, installare questo plugin, seguire le indicazioni per lumen
+
+https://github.com/fruitcake/laravel-cors
+
+
+Per spedire email installare il pacchetto
+
+composer require illuminate/mail
+
+Seguire le indicazioni:
+https://lumen.laravel.com/docs/5.7/mail
+
+Inoltre vedere questo link:
+https://laravel.com/docs/8.x/mail
+
+
+Installare questo pacchetto per aggiungere i comandi per generare i template email
+https://github.com/flipboxstudio/lumen-generator
+
+Creare un nuovo modello di mail con questo comando:
+php artisan make:mail OrderShipped
+
+
+
+

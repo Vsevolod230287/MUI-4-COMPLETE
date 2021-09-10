@@ -1,0 +1,71 @@
+Per creare una app vuota 
+
+create-react-app gest_sinistri
+
+Installare i seguenti pacchetti:
+npm install react-router-dom 
+npm install react-cookie        //Solo se devo gestire dei cookies
+
+
+Libreria grafica Material-ui
+npm install @material-ui/core    	
+npm install @material-ui/icons     
+npm install @material-ui/lab
+
+
+Pacchetti usati per il datepicket
+npm install date-fn
+npm install @date-io/date-fns
+npm install @material-ui/pickers
+npm install moment
+
+
+
+npm install react-helmet      //permette di modificare dinamicamente stile e title per SEO
+npm install axios             //Per eseguire comandi POST/GET
+npm install query-string      //Per leggere i parametri passati nell'url
+npm install react-number-format --save      //Formattare in stampa i numeri con valuta e/o separatore migliaia etc.
+											https://github.com/s-yadav/react-number-format
+											
+											
+											
+npm install material-table --save     //Tabella con funzioni di paginazione
+
+
+npm install react-dropdown-tree-select  //gestione ad albero
+										https://dowjones.github.io/react-dropdown-tree-select/#/story/readme
+							
+										https://github.com/frontend-collective/react-sortable-tree#getting-started
+
+npm install deni-react-treeview --save    /*Gestione ad albero
+
+
+
+
+Creare le seguenti cartelle dove salvare i componenti:
+auth
+components
+config
+containers
+
+
+
+File index.
+Installa 
+npm install @material-ui/core
+@date-io/moment
+@material-ui/icons
+
+
+Modulo per il tagmanager
+https://www.npmjs.com/package/react-gtm-module
+
+
+react-material-ui-form-validator
+
+
+
+
+wE4eAsdBt3wNh
+
+
